@@ -1,5 +1,8 @@
-import { express } from "express";
+import express from "express";
+import { getAuthors } from "../controllers/authorsController.js";
 
 const authorsRouter = express.Router();
 
-authors;
+authorsRouter.get("/authors", getAuthors);
+
+export { authorsRouter };

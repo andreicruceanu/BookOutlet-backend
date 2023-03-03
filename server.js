@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { userValidation } from "./middlewares/userValidation.js";
 import { userRouter } from "./routes/userRoutes.js";
+import { authorsRouter } from "./routes/authorsRoutes.js";
 import cors from "cors";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -21,6 +22,7 @@ app.use("/static", express.static(path.join(__dirname, "public")));
 app.use(userValidation);
 app.use(cors(corsOptions));
 app.use("/api/auth", userRouter);
+app.use("/api", authorsRouter);
 
 const mongoURL =
   "mongodb+srv://andrei:CtEblSxxL7buBlTU@cluster0.dcl3cah.mongodb.net/?retryWrites=true&w=majority";
