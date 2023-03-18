@@ -4,6 +4,7 @@ import { settings } from "../settings.js";
 import Jwt from "jsonwebtoken";
 import crypto from "crypto";
 import createError from "../utils/createError.js";
+import nodemailer from "nodemailer";
 
 const getUsers = (_req, res) => {
   res.send({
@@ -62,6 +63,7 @@ const userRegister = async (req, res, next) => {
     userCredentials.password = hashPassword(userCredentials.password);
     let dataUser = new UserModel(userCredentials);
     await dataUser.save();
+    await sendEmailValidation(userCredentials.email, userCredentials.firstName);
     res.status(200).send({
       message: "User registered successfully",
     });
@@ -71,13 +73,51 @@ const userRegister = async (req, res, next) => {
 };
 
 const logout = async (req, res, next) => {
-  res
-    .clearCookie("accessToken", {
-      sameSite: "none",
-      secure: true,
-    })
-    .status(200)
-    .send("User has been logged out.");
+  try {
+    res
+      .clearCookie("accessToken", {
+        sameSite: "none",
+        secure: true,
+      })
+      .status(200)
+      .send("User has been logged out.");
+  } catch (err) {
+    next(err);
+  }
+};
+
+const confirmEmail = async (req, res, next) => {
+  const hashData = req.query.data;
+
+  if (!hashData)
+    return next(createError(403, "Adresa de email nu a putut fi verificata!"));
+
+  const email = Buffer.from(hashData, "base64").toString("ascii");
+  try {
+    const checkIsNotConfirmed = await UserModel.findOne({
+      email,
+      isActivated: false,
+    });
+    const checkIsConfirmed = await UserModel.findOne({
+      email,
+      isActivated: true,
+    });
+
+    if (checkIsConfirmed)
+      return res.status(200).send("Adresa de email este deja confirmata !");
+
+    if (!checkIsNotConfirmed) {
+      return next(
+        createError(403, "Adresa de email nu a putut fi verificata!")
+      );
+    }
+
+    await UserModel.updateOne({ email }, { $set: { isActivated: true } });
+
+    res.status(200).send("Succes");
+  } catch (err) {
+    next(err);
+  }
 };
 
 //validation User Register
@@ -107,4 +147,32 @@ function hashPassword(password) {
   return hash;
 }
 
-export { getUsers, userRegister, login, logout };
+async function sendEmailValidation(email, firstName) {
+  const host = "in-v3.mailjet.com";
+  const port = 587;
+  const username = "098fc05e5308584fe73e2de871857a34";
+  const password = "6d28e35b7b58d3c17d8fabe60bbdb3cb";
+
+  const emailHash = Buffer.from(email).toString("base64");
+  const content = `<html><head><body><p>Salut , ${firstName}</p>
+  <br/><button>a href = 'http://127.0.0.1:5000/api/auth/verifyEmail?data=${emailHash}'</button></body></head></html>`;
+
+  const transport = nodemailer.createTransport({
+    host: host,
+    port: port,
+    secure: false,
+    auth: {
+      user: username,
+      pass: password,
+    },
+  });
+
+  await transport.sendMail({
+    from: "bookoutletoffice@gmail.com",
+    to: email,
+    subject: "Bine ai venit BookOutlet !",
+    html: content,
+  });
+}
+
+export { getUsers, userRegister, login, logout, confirmEmail };
