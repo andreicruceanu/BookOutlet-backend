@@ -2,14 +2,14 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema(
+const pendingUserSchema = new Schema(
   {
     lastName: {
       type: String,
       required: true,
       trim: true,
       minlength: 2,
-      maxLength: 40,
+      maxLength: 30,
     },
     firstName: {
       type: String,
@@ -22,6 +22,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       trim: true,
+      unique: true,
       minlength: 6,
       maxLength: 100,
     },
@@ -29,17 +30,17 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    terms: {
-      type: Boolean,
-      require: true,
+    token: {
+      type: String,
+      required: true,
+    },
+    userTypeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserType",
     },
     offer: {
       type: Boolean,
       require: true,
-    },
-    isActivated: {
-      type: Boolean,
-      default: false,
     },
   },
   {
@@ -48,4 +49,4 @@ const userSchema = new Schema(
   }
 );
 
-export const UserModel = mongoose.model("user", userSchema);
+export default mongoose.model("PendingUser", pendingUserSchema);

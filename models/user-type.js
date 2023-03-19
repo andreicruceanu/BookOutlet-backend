@@ -10,6 +10,7 @@ const userTypeSchema = new Schema(
   },
   {
     timestamps: true,
+    versionKey: false
   }
 );
 

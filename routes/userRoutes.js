@@ -4,8 +4,8 @@ import {
   getUsers,
   login,
   logout,
-} from "../controllers/authController.js";
-import { userRegister } from "../controllers/authController.js";
+} from "../controllers/auth-controller.js";
+import { userRegister } from "../controllers/auth-controller.js";
 
 const userRouter = express.Router();
 

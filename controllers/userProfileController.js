@@ -1,7 +1,8 @@
-import { UserModel } from "../models/UserModel.js";
+import { UserModel } from "../models/user.js";
 
 const getUserProfile = async (req, res, next) => {
   const token = req.cookies.accessToken;
+
   try {
     if (token) {
       const userProfile = await UserModel.findById(req.userId);

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { UserModel } from "../models/UserModel.js";
+import { UserModel } from "../models/user.js";
 
 // Am verificat daca email-ul exista in baza de date
 export async function userValidation(req, res, next) {

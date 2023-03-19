@@ -1,10 +1,11 @@
-import { UserModel } from "../models/UserModel.js";
 import Joi from "joi";
-import { settings } from "../settings.js";
 import Jwt from "jsonwebtoken";
 import crypto from "crypto";
 import createError from "../utils/createError.js";
 import nodemailer from "nodemailer";
+import User from "../../models/user.js";
+import PendingUser from "../../models/pending-user.js";
+import { settings } from "../settings.js";
 
 const getUsers = (_req, res) => {
   res.send({
@@ -20,7 +21,13 @@ const login = async (req, res, next) => {
     let user = await UserModel.findOne({ email, password });
 
     if (!user)
-      return next(createError(400, "Adresă de e-mail sau parolă incorecte!"));
+      return next(
+        createError(
+          400,
+          "Adresă de e-mail sau parolă incorecte!",
+          "invalid_email_password"
+        )
+      );
 
     const token = Jwt.sign(
       { id: user._id, email: user.email },
@@ -50,27 +57,82 @@ const login = async (req, res, next) => {
   }
 };
 
-const userRegister = async (req, res, next) => {
-  const userCredentials = { ...req.body };
+export const register = asyncHandler(async (req, res) => {
+  const { firstName, lastName, email, password, offer } = req.body;
 
-  const ValidationResult = validateUserRegister(userCredentials);
+  if (!firstName)
+    throw new MissingFieldException(
+      "Campul firstName lipseste din corpul cererii!"
+    );
 
-  if (ValidationResult.error) {
-    return res.status(400).send(ValidationResult.error.details[0].message);
+  if (!lastName)
+    throw new MissingFieldException(
+      "Campul lastName lipseste din corpul cererii!"
+    );
+
+  if (!email)
+    throw new MissingFieldException(
+      "Campul email lipseste din corpul cererii!"
+    );
+
+  if (!password)
+    throw new MissingFieldException(
+      "Campul password lipseste din corpul cererii!"
+    );
+
+  if (!offer)
+    throw new MissingFieldException(
+      "Campul offer lipseste din corpul cererii!"
+    );
+
+  const user = await User.findOne({ email });
+
+  if (user)
+    throw new AlreadyExistsException(
+      "Email-ul este deja folosit de alt utilizator!"
+    );
+
+  const pendingUser = await PendingUser.findOne({ email });
+
+  if (pendingUser)
+    throw new InactiveAccountException("Email-ul nu este activat!");
+
+  const token = generateActivateToken(email);
+
+  // sendEmail(
+  //     [email],
+  //     `[${process.env.MAIL_APP}] Activare cont student`,
+  //     `Pentru a putea activa contul de student poti folosi link-ul urmator http://127.0.0.1:3000/activate/${token}`
+  // )
+
+  console.log(`https://127.0.0.1:3000/activate/${token}`);
+
+  const hashedPassword = await generatePasswordHash(password);
+
+  let userTypeStudent = await UserType.findOne({ type: "student" });
+
+  if (!userTypeStudent) {
+    const newUserType = new UserType({ type: "student" });
+    userTypeStudent = await newUserType.save();
   }
 
-  try {
-    userCredentials.password = hashPassword(userCredentials.password);
-    let dataUser = new UserModel(userCredentials);
-    await dataUser.save();
-    await sendEmailValidation(userCredentials.email, userCredentials.firstName);
-    res.status(200).send({
-      message: "User registered successfully",
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+  const newPendingUser = new PendingUser({
+    firstName,
+    lastName,
+    email,
+    token,
+    offer,
+    password: hashedPassword,
+    userTypeId: userTypeStudent._id,
+  });
+
+  await newPendingUser.save();
+
+  res.json({
+    message: "Te-ai inregistrat cu succes, intra pe email sa activezi contul!",
+    severity: "info",
+  });
+});
 
 const logout = async (req, res, next) => {
   try {
