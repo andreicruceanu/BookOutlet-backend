@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import path from "path";
 import cookieParser from "cookie-parser";
 import { fileURLToPath } from "url";
-import { userValidation } from "./middlewares/userValidation.js";
 import { userRouter } from "./routes/userRoutes.js";
 import { authorsRouter } from "./routes/authorsRoutes.js";
 import cors from "cors";
@@ -23,7 +22,6 @@ const corsOptions = {
 app.use(express.json());
 app.use(cookieParser());
 app.use("/static", express.static(path.join(__dirname, "public")));
-app.use(userValidation);
 app.use(cors(corsOptions));
 app.use("/api/auth", userRouter);
 app.use("/api", authorsRouter);
@@ -43,8 +41,12 @@ mongoose
 app.use((err, req, res, next) => {
   const errorStatus = err.status || 500;
   const errorMessage = err.message || "Something went wrong!";
+  const errorCode = err.errorCode || "error_default";
+  const errorDate = new Date();
 
-  return res.status(errorStatus).send(errorMessage);
+  return res
+    .status(errorStatus)
+    .json({ errorStatus, errorMessage, errorCode, errorDate });
 });
 
 const port = 5000;

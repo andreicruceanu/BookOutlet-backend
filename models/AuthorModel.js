@@ -3,9 +3,13 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const authorSchema = new Schema({
-  attributeId: {
+  id: {
     type: Number,
-    required: true,
+    required: false,
+  },
+  description: {
+    type: String,
+    require: true,
     trim: true,
   },
   value: {
@@ -23,18 +27,13 @@ const authorSchema = new Schema({
     required: true,
     trim: true,
   },
-  imageUrlWebP: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  book: {
+  books: {
     type: Number,
     required: true,
     trim: true,
   },
   importance: {
-    type: Number,
+    type: Boolean,
     required: true,
     trim: true,
   },

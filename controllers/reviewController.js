@@ -1,25 +1,39 @@
 import { ReviewModel } from "../models/ReviewModel.js";
+import { UserModel } from "../models/UserModel.js";
 
 const createReview = async (req, res) => {
+  const productId = req.params.productId;
+
+  if (!req.user) {
+    return next(createError(401, "User not found", "user_not_fond"));
+  }
+
   const newReview = new ReviewModel({
-    productId: req.body.productId,
-    memberId: req.body.memberId,
-    memberName: req.body.memberName,
-    rating: req.body.rating,
-    text: req.body.text,
-    title: req.body.title,
+    productId: productId,
+    userId: req.user._id,
+    userName: req.user.firstName + " " + req.user.lastName,
+    rating: Number(req.body.Rating),
+    text: req.body.Text,
+    title: req.body.Title,
   });
 
   try {
     const review = await ReviewModel.findOne({
-      productId: req.body.productId,
-      memberId: req.body.memberId,
+      productId: productId,
+      userId: req.user._id,
     });
 
     if (review) {
-      return res.status(403).send("Ai creat deja un review");
+      return next(
+        createError(
+          403,
+          "You have already created a review",
+          "review_already_created"
+        )
+      );
     }
     const saveReview = await newReview.save();
+
     res.status(201).send(saveReview);
   } catch (error) {
     console.log(error);
