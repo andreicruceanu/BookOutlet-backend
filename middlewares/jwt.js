@@ -1,14 +1,27 @@
 import { settings } from "../settings.js";
 import createError from "../utils/createError.js";
 import Jwt from "jsonwebtoken";
+import { UserModel } from "../models/UserModel.js";
 
-export const verifyToken = (req, res, next) => {
-  const token = req.cookies.accessToken;
-  if (!token) return next(createError(401, "You are not authenticated!"));
+export const verifyToken = async (req, res, next) => {
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    try {
+      token = req.headers.authorization.split(" ")[1];
 
-  Jwt.verify(token, settings.secretKey, async (err, payload) => {
-    if (err) return next(createError(403, "Token is not valid!"));
-    req.userId = payload.id;
-    next();
-  });
+      const decoded = Jwt.verify(token, settings.secretKey);
+
+      req.user = await UserModel.findById(decoded.id).select("-password");
+
+      next();
+    } catch (error) {
+      return next(createError(401, "Token is not valid!", "token_invalid"));
+    }
+  }
+
+  if (!token)
+    return next(createError(401, "You are not authenticated!", "no_token"));
 };
