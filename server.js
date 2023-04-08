@@ -8,6 +8,9 @@ import { authorsRouter } from "./routes/authorsRoutes.js";
 import cors from "cors";
 import { reviewRouter } from "./routes/reviewRoutes.js";
 import { userProfileRouter } from "./routes/userProfileRoutes.js";
+import { slidersRouter } from "./routes/slidersRoutes.js";
+import { bannersRouter } from "./routes/bannersRoutes.js";
+import { booksRoutes } from "./routes/booksRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,6 +30,9 @@ app.use("/api/auth", userRouter);
 app.use("/api", authorsRouter);
 app.use("/api/product", reviewRouter);
 app.use("/api", userProfileRouter);
+app.use("/api", slidersRouter);
+app.use("/api", bannersRouter);
+app.use("/api", booksRoutes);
 
 const mongoURL =
   "mongodb+srv://andrei:CtEblSxxL7buBlTU@cluster0.dcl3cah.mongodb.net/?retryWrites=true&w=majority";

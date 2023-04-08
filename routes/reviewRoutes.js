@@ -4,7 +4,7 @@ import { verifyToken } from "../middlewares/jwt.js";
 
 const reviewRouter = express.Router();
 
-reviewRouter.post("/:productId/addreview", verifyToken, createReview);
-reviewRouter.get("/reviews/:productId", getReviews);
+reviewRouter.post("/:bookId/addreview", verifyToken, createReview);
+reviewRouter.get("/:bookId/reviews", getReviews);
 
 export { reviewRouter };
