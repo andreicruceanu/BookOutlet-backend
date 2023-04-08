@@ -26,7 +26,6 @@ const login = async (req, res, next) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        password: user.password,
         terms: user.terms,
         offer: user.offer,
         isActivated: user.isActivated,

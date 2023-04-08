@@ -4,8 +4,8 @@ const { Schema } = mongoose;
 
 const ReviewSchema = new Schema(
   {
-    productId: {
-      type: Number,
+    bookId: {
+      type: Object,
       require: true,
     },
     rating: {
