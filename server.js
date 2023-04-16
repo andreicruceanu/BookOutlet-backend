@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import path from "path";
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { userRouter } from "./routes/userRoutes.js";
 import { authorsRouter } from "./routes/authorsRoutes.js";
@@ -11,7 +12,7 @@ import { userProfileRouter } from "./routes/userProfileRoutes.js";
 import { slidersRouter } from "./routes/slidersRoutes.js";
 import { bannersRouter } from "./routes/bannersRoutes.js";
 import { booksRoutes } from "./routes/booksRoutes.js";
-
+dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
