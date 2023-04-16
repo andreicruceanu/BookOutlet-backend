@@ -4,7 +4,9 @@ import { settings } from "../settings.js";
 import Jwt from "jsonwebtoken";
 import crypto from "crypto";
 import createError from "../utils/createError.js";
-import nodemailer from "nodemailer";
+import { sendEmail } from "../mail.js";
+import { getEmailWolcome } from "../emailTeamplet.js";
+import { resetPasswordEmail } from "../emailTeamplet.js";
 
 const login = async (req, res, next) => {
   const email = req.body.email;
@@ -59,7 +61,7 @@ const userRegister = async (req, res, next) => {
     userCredentials.password = hashPassword(userCredentials.password);
     const user = await UserModel.create(userCredentials);
 
-    await sendEmailValidation(userCredentials.email, userCredentials.firstName);
+    await sendEmailWolcome(userCredentials.email, userCredentials.firstName);
 
     if (user) {
       res.status(201).json({
@@ -86,6 +88,55 @@ const logout = async (req, res, next) => {
       })
       .status(200)
       .send("User has been logged out.");
+  } catch (err) {
+    next(err);
+  }
+};
+
+const sendResetPasswordLink = async (req, res, next) => {
+  const email = req.body.email;
+
+  const user = await UserModel.findOne({ email });
+
+  if (!user) {
+    return next(createError(400, "Email not exist", "email_not_exist"));
+  }
+
+  let token = generateToken(user._id, user.email);
+  try {
+    await sendEmail(
+      user.email,
+      "Recuperare cont",
+      resetPasswordEmail(user.firstName, user.email, token)
+    );
+
+    res.status(200).send("Email-ul a fost trimis catre adresa mentionata");
+  } catch (err) {
+    next(err);
+  }
+};
+
+const resetPassword = async (req, res, next) => {
+  const { token } = req.params;
+  const password = req.body.password;
+  const confirmPassword = req.body.confirmPassword;
+
+  if (!token || !password || !confirmPassword) {
+    return next(createError(400, "Complete the fields", "complete_the_fields"));
+  }
+
+  let tokenData;
+  try {
+    tokenData = Jwt.verify(token, process.env.JWT_KEY);
+
+    const userId = tokenData.id;
+
+    await UserModel.updateOne(
+      { _id: userId },
+      { $set: { password: hashPassword(password) } }
+    );
+
+    res.status(200).send("Parola a fost schimbata cu succes!");
   } catch (err) {
     next(err);
   }
@@ -150,37 +201,22 @@ function hashPassword(password) {
   return hash;
 }
 
-async function sendEmailValidation(email, firstName) {
-  const host = "in-v3.mailjet.com";
-  const port = 587;
-  const username = "098fc05e5308584fe73e2de871857a34";
-  const password = "6d28e35b7b58d3c17d8fabe60bbdb3cb";
-
-  const emailHash = Buffer.from(email).toString("base64");
-
-  const content = `<html><head><body><p>Salut , ${firstName}</p>
-  <br/><button>a href = 'http://127.0.0.1:5000/api/auth/verifyEmail?data=${emailHash}'</button></body></head></html>`;
-
-  const transport = nodemailer.createTransport({
-    host: host,
-    port: port,
-    secure: false,
-    auth: {
-      user: username,
-      pass: password,
-    },
-  });
-
-  await transport.sendMail({
-    from: "bookoutletoffice@gmail.com",
-    to: email,
-    subject: "Bine ai venit BookOutlet !",
-    html: content,
-  });
+async function sendEmailWolcome(email, firstName) {
+  const content = getEmailWolcome(firstName);
+  sendEmail(email, "Bine ai venit pe BookOutlet !", content);
 }
 
 const generateToken = (id, email) => {
-  return Jwt.sign({ id, email }, settings.secretKey, { expiresIn: "30d" });
+  return Jwt.sign({ id, email }, process.env.JWT_KEY || "secret", {
+    expiresIn: "30d",
+  });
 };
 
-export { userRegister, login, logout, confirmEmail };
+export {
+  userRegister,
+  login,
+  logout,
+  confirmEmail,
+  sendResetPasswordLink,
+  resetPassword,
+};

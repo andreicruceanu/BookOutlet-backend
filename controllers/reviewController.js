@@ -76,7 +76,6 @@ const createReview = async (req, res, next) => {
       { id: 77828 },
       { rating: book.rating }
     );
-    console.log(updateBook);
 
     res.status(201).send(saveReview);
   } catch (error) {
