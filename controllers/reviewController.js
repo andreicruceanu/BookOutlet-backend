@@ -73,13 +73,12 @@ const createReview = async (req, res, next) => {
       book.rating.totalReviews;
 
     const updateBook = await Book.updateOne(
-      { id: 77828 },
+      { _id: bookId },
       { rating: book.rating }
     );
 
     res.status(201).send(saveReview);
   } catch (error) {
-    console.log(error);
     next();
   }
 };

@@ -12,6 +12,7 @@ import { userProfileRouter } from "./routes/userProfileRoutes.js";
 import { slidersRouter } from "./routes/slidersRoutes.js";
 import { bannersRouter } from "./routes/bannersRoutes.js";
 import { booksRoutes } from "./routes/booksRoutes.js";
+import { favoriteRouter } from "./routes/favoriteRouters.js";
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,23 +30,22 @@ app.use("/static", express.static(path.join(__dirname, "public")));
 app.use(cors(corsOptions));
 app.use("/api/auth", userRouter);
 app.use("/api", authorsRouter);
-app.use("/api/product", reviewRouter);
+app.use("/api/book", reviewRouter);
 app.use("/api", userProfileRouter);
 app.use("/api", slidersRouter);
 app.use("/api", bannersRouter);
 app.use("/api", booksRoutes);
+app.use("/api", favoriteRouter);
 
-const mongoURL =
-  "mongodb+srv://andrei:CtEblSxxL7buBlTU@cluster0.dcl3cah.mongodb.net/?retryWrites=true&w=majority";
 mongoose.set("strictQuery", true);
 mongoose
-  .connect(mongoURL, { useNewUrlParser: true })
+  .connect(process.env.MONGO_URL, { useNewUrlParser: true })
   .then(() => {
     console.log("Connect to database");
   })
   .catch((e) => console.log(e));
 
-app.use((err, req, res, next) => {
+app.use((err, _req, res, next) => {
   const errorStatus = err.status || 500;
   const errorMessage = err.message || "Something went wrong!";
   const errorCode = err.errorCode || "error_default";
@@ -56,5 +56,6 @@ app.use((err, req, res, next) => {
     .json({ errorStatus, errorMessage, errorCode, errorDate });
 });
 
-const port = 5000;
-app.listen(port, () => console.log(`Server is running on port: ${port}`));
+app.listen(process.env.PORT || 5000, () =>
+  console.log(`Server is running on port: ${process.env.PORT || 5000}`)
+);

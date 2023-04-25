@@ -39,4 +39,38 @@ const getAttributes = async (req, res, next) => {
   }
 };
 
-export { getBook, getAttributes };
+const getAllBooks = async (_req, res, next) => {
+  try {
+    const books = await Book.find(
+      {},
+      {
+        _id: 1,
+        title: 1,
+        bookId: 1,
+        url: 1,
+        price: 1,
+        rating: 1,
+        images: 1,
+        badges: 1,
+      }
+    );
+
+    const formattedBooks = books.map((item) => ({
+      _id: item._id,
+      title: item.title,
+      bookId: item.bookId,
+      url: item.url,
+      price: item.price.price,
+      oldPrice: item.price.oldPrice,
+      mainImageUrl: item.images[0].url,
+      rating: item.rating.rating,
+      badges: item.badges,
+    }));
+
+    res.status(200).json(formattedBooks);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { getBook, getAttributes, getAllBooks };
