@@ -12,7 +12,7 @@ export const verifyToken = async (req, res, next) => {
     try {
       token = req.headers.authorization.split(" ")[1];
 
-      const decoded = Jwt.verify(token, settings.secretKey);
+      const decoded = Jwt.verify(token, process.env.JWT_KEY);
 
       req.user = await UserModel.findById(decoded.id).select("-password");
 
