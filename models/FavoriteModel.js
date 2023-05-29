@@ -11,10 +11,34 @@ const FavoriteSchema = new Schema(
     },
     bookId: {
       type: Schema.Types.ObjectId,
-      ref: "Book",
-      require: true,
+      required: true,
+    },
+    mainImageUrl: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    oldPrice: {
+      type: Number,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    subtitle: {
+      type: String,
+      required: false,
+    },
+    url: {
+      type: String,
+      required: true,
     },
   },
+
   {
     timestamps: true,
     versionKey: false,
