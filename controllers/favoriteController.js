@@ -1,6 +1,8 @@
 import { Favorite } from "../models/FavoriteModel.js";
-
+import createError from "../utils/createError.js";
 const addFavorite = async (req, res, next) => {
+  const { bookId, mainImageUrl, price, oldPrice, title, subtitle, url } =
+    req.body;
   try {
     const isFavorite = await Favorite.findOne({
       user: req.user._id,
@@ -10,10 +12,15 @@ const addFavorite = async (req, res, next) => {
     if (isFavorite) {
       return res.status(200).json(isFavorite);
     }
-
     const favorite = new Favorite({
-      ...req.body,
       user: req.user._id,
+      bookId,
+      mainImageUrl,
+      price,
+      oldPrice,
+      title,
+      subtitle,
+      url,
     });
 
     await favorite.save();
@@ -41,8 +48,9 @@ const removeFavorite = async (req, res, next) => {
       user: req.user._id,
       _id: favoriteId,
     });
-    if (!favorite)
+    if (!favorite) {
       return next(createError(404, "Favorite not found", "favorite_not_found"));
+    }
 
     await favorite.remove();
 

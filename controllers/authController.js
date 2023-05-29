@@ -60,12 +60,12 @@ const userRegister = async (req, res, next) => {
   try {
     userCredentials.password = hashPassword(userCredentials.password);
     const user = await UserModel.create(userCredentials);
-
+    console.log(user);
     await sendEmailWolcome(userCredentials.email, userCredentials.firstName);
 
     if (user) {
       res.status(201).json({
-        _id: user.id,
+        id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,

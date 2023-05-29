@@ -46,6 +46,7 @@ const getAllBooks = async (_req, res, next) => {
       {
         _id: 1,
         title: 1,
+        subtitle: 1,
         bookId: 1,
         url: 1,
         price: 1,
@@ -58,6 +59,7 @@ const getAllBooks = async (_req, res, next) => {
     const formattedBooks = books.map((item) => ({
       _id: item._id,
       title: item.title,
+      subtitle: item.subtitle,
       bookId: item.bookId,
       url: item.url,
       price: item.price.price,
