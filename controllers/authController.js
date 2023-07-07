@@ -1,4 +1,5 @@
 import { UserModel } from "../models/UserModel.js";
+import { ProfileUser } from "../models/ProfileUser.js";
 import Joi from "joi";
 import { settings } from "../settings.js";
 import Jwt from "jsonwebtoken";
@@ -60,10 +61,24 @@ const userRegister = async (req, res, next) => {
   try {
     userCredentials.password = hashPassword(userCredentials.password);
     const user = await UserModel.create(userCredentials);
-    console.log(user);
+    const userProfile = {
+      profileId: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      newsletter: user.offer,
+      email: user.email,
+      username: user.email,
+      title: "Dl",
+      savedAddresses: [],
+    };
+
+    const profile = await ProfileUser.create(userProfile);
+
+    console.log(profile);
+
     await sendEmailWolcome(userCredentials.email, userCredentials.firstName);
 
-    if (user) {
+    if (user && profile) {
       res.status(201).json({
         id: user._id,
         firstName: user.firstName,
