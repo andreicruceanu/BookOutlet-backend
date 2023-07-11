@@ -32,7 +32,7 @@ const ProfileSchema = new Schema(
       type: Boolean,
       require: true,
     },
-    title: {
+    gender: {
       type: String,
     },
     username: {
