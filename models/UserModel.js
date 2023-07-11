@@ -33,7 +33,7 @@ const userSchema = new Schema(
       type: Boolean,
       require: true,
     },
-    offer: {
+    newsletter: {
       type: Boolean,
       require: true,
     },

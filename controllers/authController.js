@@ -30,7 +30,7 @@ const login = async (req, res, next) => {
         lastName: user.lastName,
         email: user.email,
         terms: user.terms,
-        offer: user.offer,
+        newsletter: user.newsletter,
         isActivated: user.isActivated,
         createAt: user.createdAt,
         updateAt: user.updatedAt,
@@ -65,10 +65,10 @@ const userRegister = async (req, res, next) => {
       profileId: user._id,
       firstName: user.firstName,
       lastName: user.lastName,
-      newsletter: user.offer,
+      newsletter: user.newsletter,
       email: user.email,
       username: user.email,
-      title: "Dl",
+      gender: "Dl",
       savedAddresses: [],
     };
 
@@ -203,7 +203,7 @@ function validateUserRegister(user) {
       .required(),
     confirmPassword: Joi.string().required().valid(Joi.ref("password")),
     terms: Joi.boolean().valid(true).required(),
-    offer: Joi.boolean(),
+    newsletter: Joi.boolean(),
   });
   return schema.validate(user);
 }
