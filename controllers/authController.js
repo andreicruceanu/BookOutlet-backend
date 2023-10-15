@@ -191,23 +191,6 @@ const confirmEmail = async (req, res, next) => {
   }
 };
 
-//validation User Register
-function validateUserRegister(user) {
-  const schema = Joi.object({
-    firstName: Joi.string().min(2).required(),
-    lastName: Joi.string().min(2).required(),
-    email: Joi.string().email().required(),
-    password: Joi.string()
-      .min(8)
-      .regex(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)
-      .required(),
-    confirmPassword: Joi.string().required().valid(Joi.ref("password")),
-    terms: Joi.boolean().valid(true).required(),
-    newsletter: Joi.boolean(),
-  });
-  return schema.validate(user);
-}
-
 function hashPassword(password) {
   const salt = settings.secretSalt;
   const hash = crypto
