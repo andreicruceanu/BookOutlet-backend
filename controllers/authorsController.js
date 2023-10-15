@@ -21,6 +21,7 @@ const getImportanceAuthors = async (req, res) => {
 
 const getAuthor = async (req, res) => {
   const { name } = req.params;
+  console.log(name);
   const url = name;
 
   const author = await AuthorModel.findOne({ url });

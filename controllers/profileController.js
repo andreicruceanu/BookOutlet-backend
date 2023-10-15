@@ -20,6 +20,7 @@ const getUserProfile = async (req, res, next) => {
 
 const updateUserProfile = async (req, res, next) => {
   const userId = req.user._id;
+  const { ...userValue } = req.body;
 
   try {
     const user = await UserModel.findById(userId);
@@ -33,10 +34,8 @@ const updateUserProfile = async (req, res, next) => {
       return next(createError(404, "Profile not found", "profile_not_found"));
     }
 
-    await UserModel.findByIdAndUpdate(
-      { _id: userId },
-      { firstName: req.body.firstName }
-    );
+    await UserModel.findByIdAndUpdate({ _id: userId }, userValue);
+    await ProfileUser.findOneAndUpdate({ profileId: userId }, userValue);
 
     res.status(200).json({ message: "User profile updated successfully" });
   } catch (error) {
