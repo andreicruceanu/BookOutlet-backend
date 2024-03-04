@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
-const mongoURL =
-  "mongodb+srv://andrei:CtEblSxxL7buBlTU@cluster0.dcl3cah.mongodb.net/?retryWrites=true&w=majority";
+const mongoURL = process.env.MONGODB_URL;
 mongoose.set("strictQuery", true);
 
 const InitiateMongoServer = async () => {
