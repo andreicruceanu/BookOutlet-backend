@@ -74,8 +74,6 @@ const userRegister = async (req, res, next) => {
 
     const profile = await ProfileUser.create(userProfile);
 
-    console.log(profile);
-
     await sendEmailWolcome(userCredentials.email, userCredentials.firstName);
 
     if (user && profile) {

@@ -25,8 +25,6 @@ const getAttributes = async (req, res, next) => {
       bookId,
     });
 
-    console.log({ bookId });
-
     if (!attributes) {
       return next(
         createError(404, "Attributes not found", "attributes_not_found")
