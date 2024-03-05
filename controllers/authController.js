@@ -10,7 +10,7 @@ import { getEmailWolcome } from "../emailTeamplet.js";
 import { resetPasswordEmail } from "../emailTeamplet.js";
 
 const login = async (req, res, next) => {
-  const email = req.body.email;
+  const email = req.body.email.toLowerCase();
   const password = hashPassword(req.body.password);
 
   try {
@@ -51,7 +51,7 @@ const userRegister = async (req, res, next) => {
     return res.status(400).send(ValidationResult.error.details[0].message);
   }
 
-  const email = userCredentials.email;
+  const email = userCredentials.email.toLowerCase();
   const userExists = await UserModel.findOne({ email });
 
   if (userExists) {
@@ -107,7 +107,7 @@ const logout = async (req, res, next) => {
 };
 
 const sendResetPasswordLink = async (req, res, next) => {
-  const email = req.body.email;
+  const email = req.body.email.toLowerCase();
 
   const user = await UserModel.findOne({ email });
 
