@@ -1,6 +1,5 @@
 import { UserModel } from "../models/UserModel.js";
 import { ProfileUser } from "../models/ProfileUser.js";
-import Joi from "joi";
 import { settings } from "../settings.js";
 import Jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -45,11 +44,11 @@ const login = async (req, res, next) => {
 const userRegister = async (req, res, next) => {
   const userCredentials = { ...req.body };
 
-  const ValidationResult = validateUserRegister(userCredentials);
+  // const ValidationResult = validateUserRegister(userCredentials);
 
-  if (ValidationResult.error) {
-    return res.status(400).send(ValidationResult.error.details[0].message);
-  }
+  // if (ValidationResult.error) {
+  //   return res.status(400).send(ValidationResult.error.details[0].message);
+  // }
 
   const email = userCredentials.email.toLowerCase();
   const userExists = await UserModel.findOne({ email });
