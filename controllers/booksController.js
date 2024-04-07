@@ -73,4 +73,48 @@ const getAllBooks = async (_req, res, next) => {
   }
 };
 
-export { getBook, getAttributes, getAllBooks };
+const getRecommendedBooks = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const books = await Book.aggregate([
+      {
+        $match: { _id: { $ne: id } },
+      },
+      {
+        $sample: { size: 10 },
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          subtitle: 1,
+          bookId: 1,
+          url: 1,
+          price: 1,
+          rating: 1,
+          images: 1,
+          badges: 1,
+        },
+      },
+    ]);
+
+    const formattedBooks = books.map((item) => ({
+      _id: item._id,
+      title: item.title,
+      subtitle: item.subtitle,
+      bookId: item.bookId,
+      url: item.url,
+      price: item.price.price,
+      oldPrice: item.price.oldPrice,
+      mainImageUrl: item.images[0].url,
+      rating: item.rating.rating,
+      badges: item.badges,
+    }));
+    res.status(200).json(formattedBooks);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+export { getBook, getAttributes, getAllBooks, getRecommendedBooks };
