@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
-const ProfileSchema = new Schema(
+const AddressSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
@@ -21,26 +21,26 @@ const ProfileSchema = new Schema(
       minlength: 2,
       maxLength: 30,
     },
-    email: {
+    phone: {
       type: String,
       required: true,
       trim: true,
-      minlength: 6,
-      maxLength: 100,
     },
-    newsletter: {
-      type: Boolean,
-      require: true,
-    },
-    gender: {
-      type: String,
-    },
-    username: {
+    country: {
       type: String,
       require: true,
+      default: "Romania",
     },
-    savedAddresses: {
-      type: Array,
+    county: {
+      type: Number,
+      require: true,
+    },
+    city: {
+      type: String,
+      require: true,
+    },
+    address: {
+      type: String,
       require: true,
     },
   },
@@ -50,4 +50,4 @@ const ProfileSchema = new Schema(
   }
 );
 
-export const ProfileUser = mongoose.model("profile", ProfileSchema);
+export const Address = mongoose.model("address", AddressSchema);

@@ -61,7 +61,7 @@ const userRegister = async (req, res, next) => {
     userCredentials.password = hashPassword(userCredentials.password);
     const user = await UserModel.create(userCredentials);
     const userProfile = {
-      profileId: user._id,
+      userId: user._id,
       firstName: user.firstName,
       lastName: user.lastName,
       newsletter: user.newsletter,

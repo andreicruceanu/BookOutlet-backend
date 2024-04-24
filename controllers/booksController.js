@@ -39,7 +39,7 @@ const getAttributes = async (req, res, next) => {
 
 const getAllBooks = async (_req, res, next) => {
   try {
-    const books = await Book.find(
+    const resultTopBooks = await Book.find(
       {},
       {
         _id: 1,
@@ -54,7 +54,7 @@ const getAllBooks = async (_req, res, next) => {
       }
     );
 
-    const formattedBooks = books.map((item) => ({
+    const topBooks = resultTopBooks.map((item) => ({
       _id: item._id,
       title: item.title,
       subtitle: item.subtitle,
@@ -67,7 +67,108 @@ const getAllBooks = async (_req, res, next) => {
       badges: item.badges,
     }));
 
-    res.status(200).json(formattedBooks);
+    const resultNewsBooks = await Book.aggregate([
+      {
+        $sample: { size: 10 },
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          subtitle: 1,
+          bookId: 1,
+          url: 1,
+          price: 1,
+          rating: 1,
+          images: 1,
+          badges: 1,
+        },
+      },
+    ]);
+
+    const newBooks = resultNewsBooks.map((item) => ({
+      _id: item._id,
+      title: item.title,
+      subtitle: item.subtitle,
+      bookId: item.bookId,
+      url: item.url,
+      price: item.price.price,
+      oldPrice: item.price.oldPrice,
+      mainImageUrl: item.images[0].url,
+      rating: item.rating.rating,
+      badges: item.badges,
+    }));
+
+    const resultNewsBookoutlet = await Book.aggregate([
+      {
+        $sample: { size: 10 },
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          subtitle: 1,
+          bookId: 1,
+          url: 1,
+          price: 1,
+          rating: 1,
+          images: 1,
+          badges: 1,
+        },
+      },
+    ]);
+
+    const newsBookoutlet = resultNewsBookoutlet.map((item) => ({
+      _id: item._id,
+      title: item.title,
+      subtitle: item.subtitle,
+      bookId: item.bookId,
+      url: item.url,
+      price: item.price.price,
+      oldPrice: item.price.oldPrice,
+      mainImageUrl: item.images[0].url,
+      rating: item.rating.rating,
+      badges: item.badges,
+    }));
+
+    const resultTopPackagesBook = await Book.aggregate([
+      {
+        $sample: { size: 10 },
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          subtitle: 1,
+          bookId: 1,
+          url: 1,
+          price: 1,
+          rating: 1,
+          images: 1,
+          badges: 1,
+        },
+      },
+    ]);
+
+    const topPackagesBook = resultTopPackagesBook.map((item) => ({
+      _id: item._id,
+      title: item.title,
+      subtitle: item.subtitle,
+      bookId: item.bookId,
+      url: item.url,
+      price: item.price.price,
+      oldPrice: item.price.oldPrice,
+      mainImageUrl: item.images[0].url,
+      rating: item.rating.rating,
+      badges: item.badges,
+    }));
+
+    res.status(200).json({
+      topBooks,
+      newBooks,
+      newsBookoutlet,
+      topPackagesBook,
+    });
   } catch (error) {
     next(error);
   }
@@ -117,49 +218,4 @@ const getRecommendedBooks = async (req, res) => {
   }
 };
 
-const getTopBooks = async (req, res) => {
-  try {
-    const books = await Book.aggregate([
-      {
-        $sample: { size: 10 },
-      },
-      {
-        $project: {
-          _id: 1,
-          title: 1,
-          subtitle: 1,
-          bookId: 1,
-          url: 1,
-          price: 1,
-          rating: 1,
-          images: 1,
-          badges: 1,
-        },
-      },
-    ]);
-
-    const formattedBooks = books.map((item) => ({
-      _id: item._id,
-      title: item.title,
-      subtitle: item.subtitle,
-      bookId: item.bookId,
-      url: item.url,
-      price: item.price.price,
-      oldPrice: item.price.oldPrice,
-      mainImageUrl: item.images[0].url,
-      rating: item.rating.rating,
-      badges: item.badges,
-    }));
-    res.status(200).json(formattedBooks);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export {
-  getBook,
-  getAttributes,
-  getAllBooks,
-  getRecommendedBooks,
-  getTopBooks,
-};
+export { getBook, getAttributes, getAllBooks, getRecommendedBooks };
