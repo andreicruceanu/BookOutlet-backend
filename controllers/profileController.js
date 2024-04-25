@@ -52,6 +52,27 @@ const updateAddress = async (req, res, next) => {
   }
 };
 
+const deleteAddress = async (req, res, next) => {
+  const user = req.user;
+  const { addressId } = req.params;
+  try {
+    const checkAddress = await Address.findOne({
+      _id: addressId,
+      userId: user,
+    });
+
+    if (!checkAddress) {
+      return next(createError(404, "address not found", "address_not_found"));
+    }
+
+    await Address.findByIdAndDelete(checkAddress._id);
+
+    return res.status(200).json("The address has been successfully deleted.");
+  } catch (err) {
+    next(err);
+  }
+};
+
 const getUserProfile = async (req, res, next) => {
   const user = req.user;
 
@@ -97,4 +118,10 @@ const updateUserProfile = async (req, res, next) => {
   }
 };
 
-export { getUserProfile, updateUserProfile, saveAddress, updateAddress };
+export {
+  getUserProfile,
+  updateUserProfile,
+  saveAddress,
+  updateAddress,
+  deleteAddress,
+};
