@@ -26,7 +26,7 @@ const getAuthor = async (req, res) => {
   const author = await AuthorModel.findOne({ url });
 
   if (!author) {
-    return res.status(500).send("Autorul nu a fost gasit");
+    return next(createError(404, "Author not found", "author_not_found"));
   } else {
     return res.status(200).send(author);
   }
