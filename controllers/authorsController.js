@@ -1,4 +1,5 @@
 import { AuthorModel } from "../models/AuthorModel.js";
+import createError from "../utils/createError.js";
 
 const getAllAuthors = async (_req, res) => {
   try {
@@ -19,7 +20,7 @@ const getImportanceAuthors = async (req, res) => {
   } catch (error) {}
 };
 
-const getAuthor = async (req, res) => {
+const getAuthor = async (req, res, next) => {
   const { name } = req.params;
   const url = name;
 
