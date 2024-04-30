@@ -20,26 +20,12 @@ const createReview = async (req, res, next) => {
     bookId: bookId,
     userId: req.user._id,
     userName: req.user.firstName + " " + req.user.lastName,
-    rating: Number(req.body.Rating),
-    text: req.body.Text,
-    title: req.body.Title,
+    rating: Number(req.body.rating),
+    text: req.body.text,
+    title: req.body.title,
   });
 
   try {
-    // const review = await ReviewModel.findOne({
-    //   productId: productId,
-    //   userId: req.user._id,
-    // });
-
-    // if (review) {
-    //   return next(
-    //     createError(
-    //       403,
-    //       "You have already created a review",
-    //       "review_already_created"
-    //     )
-    //   );
-    // }
     const saveReview = await newReview.save();
 
     switch (newReview.rating) {
@@ -72,14 +58,17 @@ const createReview = async (req, res, next) => {
         1 * book.rating.star1) /
       book.rating.totalReviews;
 
-    const updateBook = await Book.updateOne(
-      { _id: bookId },
-      { rating: book.rating }
-    );
+    await Book.updateOne({ _id: bookId }, { rating: book.rating });
 
     res.status(201).send(saveReview);
   } catch (error) {
-    next();
+    next(
+      createError(
+        500,
+        "Something went wrong. Please try again later",
+        "error_default"
+      )
+    );
   }
 };
 
